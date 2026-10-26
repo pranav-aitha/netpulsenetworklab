@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NetPulse Network Lab | Retro Subnet Calculator & IPv4 Header Visualizer</title>
+  <meta name="description" content="NetPulse Network Lab - Clean retro game-themed networking laboratory featuring an instant client-side Subnet Calculator and an interactive 32-bit IPv4 Packet Header Visualizer.">
+  
+  <!-- Retro Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20%220%22%20100%20100><text y=%22.9em%22 font-size=%2290%22>🕹️</text></svg>">
+</head>
+<body>
+  <!-- CRT Monitor Scanline Layer -->
+  <div class="crt-overlay" id="crt-overlay"></div>
+
+  <div class="arcade-container">
+    <!-- Top Arcade Machine Header -->
+    <header class="arcade-header">
+      <div class="header-top">
+        <div class="logo-area">
+          <div class="logo-pixel-icon">📡</div>
+          <div>
+            <h1 class="game-title">NETPULSE NETWORK LAB</h1>
+            <p class="tagline">&gt; SYSTEM STATUS: READY // CLIENT-SIDE PROTOCOL SUITE</p>
+          </div>
+        </div>
+
+        <div class="arcade-settings">
+          <button class="retro-btn active" id="sound-toggle-btn" title="Toggle 8-bit sound effects">
+            <span class="icon">🔊</span> SOUND: ON
+          </button>
+          <button class="retro-btn active" id="crt-toggle-btn" title="Toggle CRT scanline filter">
+            <span class="icon">📺</span> CRT: ON
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Stage Selector -->
+      <nav class="stage-selector" aria-label="Quick Navigation">
+        <button class="stage-nav-btn" data-target="stage-subnet">&gt; STAGE 1: SUBNET CALCULATOR</button>
+        <button class="stage-nav-btn" data-target="stage-header">&gt; STAGE 2: IPV4 HEADER MAP</button>
+        <button class="stage-nav-btn" data-target="stage-sandbox">&gt; STAGE 3: PACKET SANDBOX</button>
+      </nav>
+    </header>
+
+    <!-- STAGE 1: SUBNET CALCULATOR -->
+    <main>
+      <section class="arcade-section stage-1" id="stage-subnet">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title pink-glow">LEVEL 01 // SUBNET CALCULATOR</h2>
+            <p class="section-desc">Instant real-time IPv4 CIDR breakdown, address boundaries, and host capacities.</p>
+          </div>
+        </div>
+
+        <!-- Calculator Input Deck -->
+        <div class="calc-deck">
+          <div class="inputs-grid">
+            <div class="input-group">
+              <label for="ip-input">&gt; TARGET IP ADDRESS</label>
+              <input type="text" id="ip-input" class="retro-input" value="192.168.1.50" placeholder="e.g. 192.168.1.50" autocomplete="off" spellcheck="false">
+            </div>
+
+            <div class="input-group">
+              <label for="cidr-slider">&gt; CIDR PREFIX LENGTH: <span id="cidr-label" class="pink-glow">/26</span></label>
+              <div class="cidr-slider-wrap">
+                <input type="range" id="cidr-slider" class="retro-slider" min="0" max="32" value="26">
+                <input type="number" id="cidr-input" class="cidr-val-box" min="0" max="32" value="26">
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Cartridge Presets -->
+          <div class="presets-strip">
+            <span class="preset-title">[LOAD CARTRIDGE]:</span>
+            <button class="preset-btn" data-ip="192.168.1.100" data-cidr="26">LAN /26</button>
+            <button class="preset-btn" data-ip="10.0.0.1" data-cidr="8">CLOUD /8</button>
+            <button class="preset-btn" data-ip="172.16.50.1" data-cidr="20">MID-NET /20</button>
+            <button class="preset-btn" data-ip="192.168.10.1" data-cidr="30">P2P LINK /30</button>
+            <button class="preset-btn" data-ip="127.0.0.1" data-cidr="32">LOOPBACK /32</button>
+          </div>
+        </div>
+
+        <!-- Error Notification -->
+        <div id="calc-error" class="error-banner hidden" role="alert"></div>
+
+        <!-- Subnet HUD Readouts -->
+        <div class="results-grid">
+          <!-- Netmask -->
+          <div class="hud-card accent-cyan">
+            <div class="hud-label">
+              <span>NETMASK</span>
+              <button class="copy-btn" data-target="res-netmask">COPY</button>
+            </div>
+            <div class="hud-value" id="res-netmask">255.255.255.192</div>
+            <div class="hud-sub">Subnet Bitmask</div>
+          </div>
+
+          <!-- Subnet ID (Network Address) -->
+          <div class="hud-card accent-pink">
+            <div class="hud-label">
+              <span>SUBNET ID (NETWORK)</span>
+              <button class="copy-btn" data-target="res-subnet-id">COPY</button>
+            </div>
+            <div class="hud-value" id="res-subnet-id">192.168.1.0</div>
+            <div class="hud-sub">Network Base Address</div>
+          </div>
+
+          <!-- Broadcast ID -->
+          <div class="hud-card accent-amber">
+            <div class="hud-label">
+              <span>BROADCAST ID</span>
+              <button class="copy-btn" data-target="res-broadcast-id">COPY</button>
+            </div>
+            <div class="hud-value" id="res-broadcast-id">192.168.1.63</div>
+            <div class="hud-sub">Subnet Broadcast Destination</div>
+          </div>
+
+          <!-- Usable Host Count -->
+          <div class="hud-card accent-green">
+            <div class="hud-label">
+              <span>USABLE HOSTS</span>
+            </div>
+            <div class="hud-value" id="res-usable-hosts">62</div>
+            <div class="hud-sub">Available Host Nodes</div>
+          </div>
+
+          <!-- Usable Host Range -->
+          <div class="hud-card accent-cyan">
+            <div class="hud-label">
+              <span>USABLE HOST RANGE</span>
+            </div>
+            <div class="hud-value" id="res-host-range">192.168.1.1 — 192.168.1.62</div>
+            <div class="hud-sub">First Usable to Last Usable</div>
+          </div>
+
+          <!-- Wildcard Mask -->
+          <div class="hud-card accent-pink">
+            <div class="hud-label">
+              <span>WILDCARD MASK</span>
+              <button class="copy-btn" data-target="res-wildcard">COPY</button>
+            </div>
+            <div class="hud-value" id="res-wildcard">0.0.0.63</div>
+            <div class="hud-sub">ACL Inverted Mask</div>
+          </div>
+
+          <!-- Total Hosts -->
+          <div class="hud-card accent-amber">
+            <div class="hud-label">
+              <span>TOTAL ADDRESSES</span>
+            </div>
+            <div class="hud-value" id="res-total-hosts">64</div>
+            <div class="hud-sub">2^(32 - CIDR) Total Slots</div>
+          </div>
+
+          <!-- Class & Scope -->
+          <div class="hud-card accent-green">
+            <div class="hud-label">
+              <span>CLASSIFICATION & SCOPE</span>
+            </div>
+            <div class="hud-value" id="res-class">Class C</div>
+            <div class="hud-sub" id="res-scope">Private (RFC 1918)</div>
+          </div>
+        </div>
+
+        <!-- 32-Bit Binary Visualizer -->
+        <div class="binary-section">
+          <div class="binary-head">
+            <span class="binary-title">&gt; 32-BIT BINARY ARCHITECTURE MAP</span>
+            <div class="binary-badges">
+              <span class="pixel-badge badge-cyan" id="net-bits-badge">26 NETWORK BITS</span>
+              <span class="pixel-badge badge-amber" id="host-bits-badge">6 HOST BITS</span>
+            </div>
+          </div>
+          <div class="binary-bitstream" id="binary-bitstream" aria-label="Binary bitstream visualization">
+            <!-- Dynamically populated with 32 interactive bit chips -->
+          </div>
+        </div>
+      </section>
+
+      <!-- STAGE 2: INTERACTIVE IPV4 HEADER VISUALIZER -->
+      <section class="arcade-section stage-2" id="stage-header">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title cyan-glow">LEVEL 02 // INTERACTIVE IPV4 HEADER VISUALIZER</h2>
+            <p class="section-desc">Click or hover over any 32-bit field below to inspect its routing duties, defensive capabilities, and security safeguards.</p>
+          </div>
+        </div>
+
+        <!-- Bit Ruler Scale -->
+        <div class="bit-ruler">
+          <span>BIT 0</span>
+          <span>BIT 4</span>
+          <span>BIT 8</span>
+          <span>BIT 16</span>
+          <span>BIT 19</span>
+          <span>BIT 31</span>
+        </div>
+
+        <!-- 32-Bit Width Grid Map -->
+        <div class="header-grid-wrapper">
+          <div class="header-grid" id="header-grid">
+            <!-- Dynamically populated from HeaderData -->
+          </div>
+        </div>
+
+        <!-- Diagnostic & Defensive Inspection Terminal -->
+        <div class="inspect-section">
+          <!-- Field Inspection Terminal -->
+          <div class="inspect-card" id="header-inspect-card">
+            <div class="inspect-header">
+              <h3 class="inspect-title" id="inspect-title">TTL (TIME TO LIVE)</h3>
+              <span class="pixel-badge badge-cyan" id="inspect-badge">LOOP TERMINATOR</span>
+            </div>
+
+            <div class="inspect-meta-row">
+              <div class="inspect-meta-item">
+                <div class="label">BIT ALLOCATION</div>
+                <div class="val" id="inspect-bits">8 BITS (64 - 71)</div>
+              </div>
+              <div class="inspect-meta-item">
+                <div class="label">EXAMPLE HEX</div>
+                <div class="val" id="inspect-hex">0x40</div>
+              </div>
+              <div class="inspect-meta-item">
+                <div class="label">DEFAULT VALUE</div>
+                <div class="val" id="inspect-default">64 (Linux) / 128 (Win)</div>
+              </div>
+            </div>
+
+            <div class="inspect-details">
+              <div class="detail-block">
+                <h4 class="role-head"><span>[PRIMARY ROLE]</span></h4>
+                <p id="inspect-role">A hop counter decremented by 1 at every L3 router hop. When TTL reaches 0, the packet is discarded.</p>
+              </div>
+
+              <div class="detail-block">
+                <h4 class="route-head"><span>[ROUTING FUNCTION]</span></h4>
+                <p id="inspect-routing">Primary routing loop killer. During dynamic routing convergence (e.g. OSPF/BGP flapping), packets caught in loops are dropped once TTL reaches 0, returning an ICMP Time Exceeded (Type 11) to the sender.</p>
+              </div>
+
+              <div class="detail-block">
+                <h4 class="defense-head"><span>[SECURITY & NETWORK DEFENSE]</span></h4>
+                <p id="inspect-defense">Critical defense against endless routing loops and packet storm meltdown. Also serves as the foundation for the traceroute utility and enables OS fingerprinting detection. Protects against BGP route poisoning storms.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- STAGE 3: PACKET SANDBOX SIMULATOR -->
+          <div class="sim-card" id="stage-sandbox">
+            <h3 class="sim-title">PACKET SIMULATOR</h3>
+            <p class="sim-desc">Tweak live datagram values to test router defense triggers in real time.</p>
+
+            <!-- TTL Simulator -->
+            <div class="sim-control-group">
+              <label for="sim-ttl-slider">&gt; HOP TTL SIMULATOR: <span id="sim-ttl-val" class="pink-glow">64</span> HOPS</label>
+              <div class="sim-slider-row">
+                <input type="range" id="sim-ttl-slider" class="retro-slider" min="0" max="255" value="64">
+              </div>
+              <div id="sim-ttl-status" class="sim-status-box status-ok">
+                HEALTHY: Can traverse up to 64 router hops across the Internet
+              </div>
+            </div>
+
+            <!-- Protocol Selector -->
+            <div class="sim-control-group">
+              <label for="sim-proto-select">&gt; ENCAPSULATED PROTOCOL</label>
+              <select id="sim-proto-select" class="sim-select">
+                <option value="6">0x06 - TCP (Transmission Control Protocol)</option>
+                <option value="17">0x11 - UDP (User Datagram Protocol)</option>
+                <option value="1">0x01 - ICMP (Internet Control Message Protocol)</option>
+              </select>
+            </div>
+
+            <!-- Flags Simulator -->
+            <div class="sim-control-group">
+              <label>&gt; FRAGMENTATION DEFENSE FLAGS</label>
+              <div class="sim-flags-row">
+                <label class="retro-checkbox">
+                  <input type="checkbox" id="sim-flag-df" checked>
+                  <span>DF (Don't Fragment)</span>
+                </label>
+                <label class="retro-checkbox">
+                  <input type="checkbox" id="sim-flag-mf">
+                  <span>MF (More Fragments)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Arcade Footer -->
+    <footer class="arcade-footer">
+      <div class="footer-top">
+        <p class="made-by">
+          Made with <span class="heart-emoji">❤️</span> By <span class="author-name">Pranav Aitha</span>
+        </p>
+      </div>
+
+      <!-- Social Media Links -->
+      <div class="social-links">
+        <a href="https://x.com/PRANAV_AITHA" target="_blank" rel="noopener noreferrer" class="social-pill x-link">
+          <span>✖</span> X / Twitter
+        </a>
+        <a href="https://github.com/pranav-aitha" target="_blank" rel="noopener noreferrer" class="social-pill github-link">
+          <span>🐙</span> GitHub
+        </a>
+        <a href="https://instagram.com/pranav_aitha" target="_blank" rel="noopener noreferrer" class="social-pill instagram-link">
+          <span>📸</span> Instagram
+        </a>
+      </div>
+
+      <div class="footer-meta">
+        <p>&copy; 2026 NetPulse Network Lab &bull; Released under the <a href="LICENSE" class="footer-pages-link">MIT License</a></p>
+        <p style="margin-top: 6px;">
+          Live Site: <a href="https://pranav-aitha.github.io/netpulsenetworklab/" class="footer-pages-link" target="_blank" rel="noopener noreferrer">https://pranav-aitha.github.io/netpulsenetworklab/</a>
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/subnet.js"></script>
+  <script src="js/header.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
